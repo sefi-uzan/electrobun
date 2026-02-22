@@ -5054,9 +5054,12 @@ CefRefPtr<CefRequestContext> CreateRequestContextForPartition(const char* partit
         NSWindow *window = [notification object];
         NSRect windowFrame = [window frame];
         ContainerView *containerView = [window contentView];
-        NSRect fullFrame = [window frame];
-        fullFrame.origin.x = 0;
-        fullFrame.origin.y = 0;                
+        // Use contentView.bounds instead of window.frame so the height excludes the
+        // title bar. With titleBarStyle:"default" the two differ by the title bar
+        // height; using window.frame here caused fullSize webviews to be taller than
+        // the visible content area, making window.innerHeight report an inflated value
+        // after the first resize.
+        NSRect fullFrame = [window contentView].bounds;               
                 
         for (AbstractView *abstractView in containerView.abstractViews) {                              
             if (abstractView.fullSize) {                
